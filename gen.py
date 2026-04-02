@@ -3,6 +3,7 @@ import os
 from dotenv import find_dotenv, load_dotenv
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 load_dotenv()
 
 
@@ -40,7 +41,9 @@ Elon was an enthusiastic reader of books, and had attributed his success in part
     )
 
      ### temperature 0  to 0.3 more correct more 0.8 to 1 more creative
-    llm = ChatOpenAI(temperature=0,model="gpt-5")
+   # llm = ChatGoogleGenerativeAI(temperature=0,model="gpt-5")
+   # llm = ChatGoogleGenerativeAI(temperature=0, model="gemini-1.5-flash")
+    llm = ChatGoogleGenerativeAI(temperature=0, model="gemini-2.5-flash")
 
     ### LCEL  syntax chain both link one runnable chain 
     chain= summary_prompt_template | llm
