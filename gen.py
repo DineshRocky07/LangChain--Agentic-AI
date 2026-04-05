@@ -43,7 +43,8 @@ Elon was an enthusiastic reader of books, and had attributed his success in part
      ### temperature 0  to 0.3 more correct more 0.8 to 1 more creative
    # llm = ChatGoogleGenerativeAI(temperature=0,model="gpt-5")
    # llm = ChatGoogleGenerativeAI(temperature=0, model="gemini-1.5-flash")
-    llm = ChatGoogleGenerativeAI(temperature=0, model="gemini-2.5-flash")
+    llm = ChatGoogleGenerativeAI(temperature=1, model="gemini-2.5-flash")
+    
 
     ### LCEL  syntax chain both link one runnable chain 
     chain= summary_prompt_template | llm
