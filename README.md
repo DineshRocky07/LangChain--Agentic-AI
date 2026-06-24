@@ -43,3 +43,35 @@ Tool = Employee
 Gemini = Brain
 
 #####################################
+
+VERSION 2:
+24-jUNE VIDOE 21-
+
+STEP 1 : 
+- from tavily import TavilyClinet
+
+step 2:
+  tavily=TavilyClinet() 
+    
+ - this auto search env and get apikey
+    
+step 3:
+   tool function 
+     -Static return to real return search capailty
+-   return tavily.search(query=query)
+step 4:
+
+    finally we give full permission to access internet tavily
+
+Version 3:
+   - langcain tavily
+   - inbuild tavily search and more 
+step 1:
+    we use own tavily lanchain
+-  from langchain_tavily import tavilySearch
+
+step 2:
+    just 
+- tools = [tavilySearch ] and RUn the code
+
+    
