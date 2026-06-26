@@ -75,3 +75,37 @@ step 2:
 - tools = [tavilySearch ] and RUn the code
 
     
+- version 4
+- structure output 
+
+step 1
+  from typing import List
+  from pydantic import BaseModel, Field #own stuture use BaseModel
+
+step 2: 
+  - added new class
+
+class Source(BaseModel):
+    """Schema for source used by agent"""
+    url:str =Field(description="The URL of the source")
+
+class AgentResponse(BaseModel):
+    """schema for agent response with answer and Source"""
+    
+    answer:str = Field(description="The agents answer to the query")
+    source:List[Source]=Field(default_factory=list,description="List of sources uses to geneate the answer")
+
+step 3:
+   agent = create_agent(model=llm, tools=tools,response_format=AgentResponse)
+    
+   # some debug more we try
+
+# Viode numeber 23 
+
+ use stuctutre op 
+
+ 1.two type 
+         1.toolstrategey 
+         2. providerstategey [defautl] langchain past project we done
+  
+
