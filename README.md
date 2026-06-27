@@ -109,3 +109,33 @@ step 3:
          2. providerstategey [defautl] langchain past project we done
   
 
+# Agent Understand HOOD layer1 video 24 to 27
+- 24 
+   explain core all 
+   what layer and what we do
+
+- 25
+   waht we build : Ecommerce Agent
+   Agent about query from agent and get the discount 
+
+- 26
+   here we explain ReACT loop
+   # Top algorth foundaction in AI
+   
+    diagram:
+    see the diagam
+    user query -> THought -> Action -> tool -> Observation -> THought -> answer
+  
+- 27 stepup
+
+    this project we need ollama
+
+    # uv add langchain langchain-ollama lagchain-google-genai python-dotenv black isort
+    # download qwen3:1.7b for toll calling support we use qwen3.5:0.8b
+
+- 28 Write tools
+  # Layer [1] for ReAct Loop
+  
+  Creat a new file name: 1_agent_loop_langchain_tool_calling.py
+  
+
