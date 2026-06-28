@@ -139,7 +139,7 @@ step 3:
   Creat a new file name: 1_agent_loop_langchain_tool_calling.py
   # need more attenction for this code in future 
 
-- 29
+- 29 30 31
 
   how to easy chage model use that import init_chat_model
     Model= "qwen3.5:0.8b"
@@ -150,3 +150,62 @@ step 3:
    
    # main concern is switch model ok but this not enoff
 
+# Section [6]
+  # -- [Layer 2] Raw function calling
+
+  - 32 33 34
+  # this vidoe we learn Tool raw how they work without langchain
+  # this full you will see - 2 agent loop.py 
+  # with out lagchain how difficult to apply tools need more study on this
+  🧑 USER: "What is the price of a laptop?"
+   │
+   ▼
+ 📥 STEP 1: THE MEMORY BANK (messages list)
+    We put the user's question into the 'messages' list.
+    [ {"role": "user", "content": "What is the price of a laptop?"} ]
+   │
+   ▼
+ 🧠 STEP 2: THE AI BRAIN (ollama_chat_trace)
+    We hand the memory bank to the AI. The AI thinks, but it CANNOT 
+    look up the price itself. So, it asks you to do it.
+    It generates a JSON package:
+      {
+         "name": "get_product_price",
+         "arguments": {"product": "laptop"}
+      }
+   │
+   ▼
+ ⚙️ STEP 3: THE PYTHON INTERCEPTOR (Your Code)
+    Your code catches the AI's JSON package and breaks it apart:
+    • tool_name = "get_product_price"
+    • tool_args = {"product": "laptop"}
+   │
+   ▼
+ 📖 STEP 4: THE DICTIONARY LOOKUP (tools_dict)
+    Python needs to translate the text string into real code.
+    It looks up "get_product_price" in your tools_dict and finds 
+    the actual function sitting in memory.
+    • tool_to_use = <function get_product_price>
+   │
+   ▼
+ ⚡ STEP 5: THE EXECUTION (**)
+    Python unpacks the bag of arguments directly into the function.
+    CODE:  tool_to_use(**tool_args)
+    MEANS: get_product_price(product="laptop")
+   │
+   ▼
+ 🎯 STEP 6: THE OBSERVATION (The Result)
+    The function runs, checks the database, and spits out the answer.
+    • observation = 50000
+   │
+   ▼
+ 📦 STEP 7: UPDATING THE MEMORY (messages.append)
+    We write the result down on a piece of paper and shove it back 
+    into the memory bank so the AI can read it.
+    [ {"role": "tool", "name": "get_product_price", "content": "50000"} ]
+   │
+   └───► LOOP RESTARTS ↻ 
+         We send the updated memory bank back to the AI (Step 2).
+         The AI reads it, sees the price is 50000, and finally has 
+         enough info to talk to the user!
+         
