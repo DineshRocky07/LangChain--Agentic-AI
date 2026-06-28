@@ -137,5 +137,16 @@ step 3:
   # Layer [1] for ReAct Loop
   
   Creat a new file name: 1_agent_loop_langchain_tool_calling.py
-  
+  # need more attenction for this code in future 
+
+- 29
+
+  how to easy chage model use that import init_chat_model
+    Model= "qwen3.5:0.8b"
+    Model_gen="gemini-1.5-flash"
+    # #llm = init_chat_model(f"ollama:{Model}",temperature=0)
+    llm = init_chat_model(f"google_genai:{Model_gen}",temperature=0)
+    llm_with_tools = llm.bind_tools(tools)
+   
+   # main concern is switch model ok but this not enoff
 

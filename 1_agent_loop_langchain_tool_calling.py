@@ -6,15 +6,18 @@ from langchain.chat_models import init_chat_model # easy to use for multi api co
 from langchain.tools import tool           #empoyee
 from langchain_core.messages import HumanMessage,SystemMessage,ToolMessage #system message menas rules
 from langsmith import traceable  # tracing the project flow 
+
+
 Max_Iterations = 10
 Model= "qwen3.5:0.8b"
+Model_gen="gemini-2.5-flash"
 
 @tool
 def get_product_price(product: str) -> float:  # return value is float
     """
     Look up the price of a product in the catalog."""
     print(f"> Executing get_product_price(product='{product}')")
-    prices= {"laptop":50000.99,"Headphone":1999.95,"Keyboard": 89.50}
+    prices= {"laptop":50000,"Headphone":1999.95,"Keyboard": 89.50}
     return prices.get(product,0) # that zero default value
 
 @tool
@@ -30,9 +33,14 @@ def apply_discount(price:float,discount_tier: str)-> float:
 @traceable(name="Lagchain Agent Loop")
 def run_agent(question:str):
     tools=[get_product_price,apply_discount]
-    tools_dict = {t.name: t for t in tools}
 
-    llm = init_chat_model(f"ollama:{Model}",temperature=0)
+    #print(f"Tools:{tools}")
+    
+
+    tools_dict = {t.name: t for t in tools}
+    
+    #llm = init_chat_model(f"ollama:{Model}",temperature=0)
+    llm = init_chat_model(f"google_genai:{Model_gen}",temperature=0)
     llm_with_tools = llm.bind_tools(tools)
     
     print(f"Question: {question}")
@@ -77,9 +85,12 @@ def run_agent(question:str):
 
 
         tool_to_use = tools_dict.get(tool_name)
+        # print(f"Tool name {tool_name}")
+        # print(f"Tool to use {tool_to_use}")
         if tool_to_use is None:
             raise ValueError(f"Tools {tool_name} not found")
         observation =tool_to_use.invoke(tool_args)
+       # print(f"Tool args {tool_args}")
         print(f"[Tool Result] {observation}")
 
         message.append(ai_message)
