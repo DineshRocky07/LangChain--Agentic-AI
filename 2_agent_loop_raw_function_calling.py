@@ -11,9 +11,9 @@ import ollama
 
 
 Max_Iterations = 10
-Model= "qwen3.5:0.8b"
+Model= "qwen3:8b"
 
-#@tool removed
+#@tool removed 
 @traceable(name="tool")
 def get_product_price(product: str) -> float:  # return value is float
     """
