@@ -236,3 +236,20 @@ Begin!
 
 Question: {input}
 Thought:{agent_scratchpad}
+
+# 36 Generating dynamic Tool Description in python 
+
+    complted but old how llm and ReAct work very tuff
+
+# 40 41 function calling 
+
+   tool calling and Recation is not relaiable 
+
+   # but function calling more relaible that maily focus
+
+   - benifit 
+      stucture and relainbale
+      effective token cost saving 
+
+      development easy
+      structure flow
