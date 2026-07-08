@@ -253,3 +253,32 @@ Thought:{agent_scratchpad}
 
       development easy
       structure flow
+
+
+# 42 video RAG
+   - Rag is used for our document -> chunking -> save -> get use llm
+
+# 43 Indroduction RAG implementaction
+   - this all topic we will see
+     
+    #   Embeddings
+        use vercote method easy to get checking data
+    #  Vector stores (Pinecone)
+
+    #  RetrievalQA Chain
+
+    # LangChain document loaders  
+      - load documet use langcain
+
+    #  LangChain text splitters
+
+# 45 start in rag_first.py
+
+from dotenv import load_dotenv
+from langchain_community.document_loaders import text_loader  #load data into text
+from langchain_text_splitter import character_text_splitter  #split large text into chunks 
+from langchain_google_genai import GoogleGenerativeAIEmbeddings # this method is used to convert text into vector representation
+from langchain_pinecone import Pineconevectorstore # this method is used to store vector DB into pinecone
+
+    
+     
