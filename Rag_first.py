@@ -5,6 +5,7 @@ from langchain_text_splitters import CharacterTextSplitter  #split large text in
 from langchain_google_genai import GoogleGenerativeAIEmbeddings # this method is used to convert text into vector representation
 from langchain_pinecone import PineconeVectorStore # this method is used to store vector representation into pinecone
 
+
 load_dotenv()
 
 if __name__ == "__main__":
@@ -20,9 +21,9 @@ if __name__ == "__main__":
 
    # embeddings = GoogleGenerativeAIEmbeddings(model="text-embedding-004")
     embeddings = GoogleGenerativeAIEmbeddings(
-        model="models/text-embedding-004",
-        google_api_key=os.getenv("GOOGLE_API_KEY"),
-        task_type="retrieval_document"
+        model="gemini-embedding-2",
+        #google_api_key=os.getenv("GOOGLE_API_KEY"),
     )
     print("injuction")
     PineconeVectorStore.from_documents(text,embeddings, index_name=os.getenv("INDEX_NAME"))
+    print("injection completed")

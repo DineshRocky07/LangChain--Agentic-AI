@@ -280,5 +280,11 @@ from langchain_text_splitter import character_text_splitter  #split large text i
 from langchain_google_genai import GoogleGenerativeAIEmbeddings # this method is used to convert text into vector representation
 from langchain_pinecone import Pineconevectorstore # this method is used to store vector DB into pinecone
 
-    
+# 46 and 47 Data indexing complte you can see in Rag_first.py 
+   document loader -> data chunking -> embedding-> vercore DB like pinecone
+# 48 we will do data retricial and generation 
+  
+    user query ->vector embedding -> vector Db -> top-K chucks 
+                                                               - llm -> response 
      
+   # file name Rag_second.py
