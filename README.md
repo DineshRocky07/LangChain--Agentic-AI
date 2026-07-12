@@ -287,4 +287,14 @@ from langchain_pinecone import Pineconevectorstore # this method is used to stor
     user query ->vector embedding -> vector Db -> top-K chucks 
                                                                - llm -> response 
      
-   # file name Rag_second.py
+   # file name Rag_second without LCEL.py  LangChain Expression Language
+
+# 49 Rag use LCEL
+   from langchain_core.output_parsers import StrOutputParser
+   from langchain_core.runnables import RunnablePassthrough  # input and op same
+   from operator import itemgetter  #
+
+   create new function langchain as chain
+ # create_retrieval_chain_with_lcel() need toe lean this fully 
+   
+
