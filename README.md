@@ -1,163 +1,199 @@
-# LangChain--Agentic-AI-Engineering-with-LangChain-LangGraph
-Langchain_RAG_Beginner Instructor: Eden Marco
+﻿# 🦜🔗 LangChain & Agentic AI: Complete Master Learning Guide
 
-step 1: uv init 
+> **Course:** Agentic AI Engineering with LangChain & LangGraph  
+> **Instructor:** Eden Marco  
+> **Author & Learner:** [@DineshRocky07](https://github.com/DineshRocky07)  
+> **Repository:** [DineshRocky07/LangChain--Agentic-AI](https://github.com/DineshRocky07/LangChain--Agentic-AI.git)
 
-step 2:
-        uv add langchain langchain-google-genai langchain-tavily tavily-python python-dotenv black isort
+---
 
-langchain          	Main LangChain framework for chains, prompts, agents, tools
-langchain-google-genai	Connect LangChain to Gemini models
-langchain-tavily	LangChain wrapper for Tavily search
-tavily-python	Direct Tavily API client
-python-dotenv	Load API keys from .env file
-black	Automatically format Python code
-isort	Automatically sort imports
+## 📑 Table of Contents
 
-step 3:
-      env we alrady have 
-           1.genai key 
-           2.langsmith key
-           3.tavily 
-           
-step 4:
- 
+1. [Overview & Core Mental Model](#-overview--core-mental-model)
+2. [Project Setup & Tooling](#-project-setup--tooling)
+3. [Environment Configuration & LangSmith Tracing](#-environment-configuration--langsmith-tracing)
+4. [Evolution of AI Agents & Tools (Versions 1 - 4)](#-evolution-of-ai-agents--tools-versions-1---4)
+5. [Under the Hood: The 3 Layers of Agents](#-under-the-hood-the-3-layers-of-agents)
+   - [Layer 1: LangChain Tool Calling & Model Switching](#layer-1-langchain-tool-calling--model-switching)
+   - [Layer 2: Raw Function Calling & The 7-Step Memory Loop](#layer-2-raw-function-calling--the-7-step-memory-loop)
+   - [Layer 3: The Foundation of ReAct Prompting](#layer-3-the-foundation-of-react-prompting)
+6. [RAG (Retrieval-Augmented Generation)](#-rag-retrieval-augmented-generation)
+   - [Phase 1: Data Ingestion & Indexing](#phase-1-data-ingestion--indexing-rag_firstpy)
+   - [Phase 2: Retrieval & Generation (Without LCEL vs With LCEL)](#phase-2-retrieval--generation-rag_second_without-lcelpy)
+7. [🌿 Branch Directory & Project Index](#-branch-directory--project-index)
+
+---
+
+## 🧠 Overview & Core Mental Model
+
+```text
+###########################################################
+#               THE AGENTIC TRIAD MENTAL MODEL            #
+###########################################################
+
+   👔 AGENT   = The Manager   (Decides what steps to take)
+   🛠️ TOOL    = The Employee  (Performs specific jobs)
+   🧠 GEMINI  = The Brain     (Reasons and generates logic)
+
+###########################################################
+```
+
+### High-Level AI Hierarchy (Wiki)
+- **LLM** ↓ The brain
+- **Prompt** ↓ Instructions for the brain
+- **Chain** ↓ Prompt + LLM connected together
+- **Tool** ↓ Something the AI can use/do
+- **Agent** ↓ AI decides which tools/actions to use
+- **LangGraph** ↓ Controls a complex workflow/loop
+- **Reflection** ↓ Generate → Review → Improve
+
+---
+
+## ⚙️ Project Setup & Tooling
+
+We use modern Python packaging with **`uv`** (fastest Python package manager) and formatting tools:
+
+```bash
+# Step 1: Initialize uv project
+uv init
+
+# Step 2: Install primary dependencies
+uv add langchain langchain-google-genai langchain-tavily tavily-python python-dotenv black isort
+```
+
+### Core Package Roles
+| Package | Role & Purpose |
+|---|---|
+| `langchain` | Main LangChain framework for chains, prompts, agents, and tools |
+| `langchain-google-genai` | Connects LangChain to Google Gemini models (`gemini-1.5-flash`, `gemini-2.5-flash`) |
+| `langchain-tavily` | LangChain wrapper for Tavily real-time web search |
+| `tavily-python` | Direct Tavily API client |
+| `langchain-ollama` | Connects to local open-source models running on Ollama (`qwen3.5`, `gemma3`) |
+| `langchain-pinecone` | Vector store client for Pinecone vector database |
+| `langsmith` | Observability, debugging, and execution tracing |
+| `python-dotenv` | Loads API keys and configurations from `.env` |
+| `black` | Automatically formats Python code to PEP 8 standards |
+| `isort` | Automatically sorts imports |
+
+---
+
+## 🔐 Environment Configuration & LangSmith Tracing
+
+Create a `.env` file in the root directory:
+
+```env
+# Google Gemini API Key
+GOOGLE_API_KEY="your_gemini_api_key"
+
+# LangSmith Observability & Tracing
+LANGSMITH_TRACING="true"
+LANGSMITH_API_KEY="your_langsmith_key"
+LANGSMITH_PROJECT="LangChain-Agentic-AI"
+
+# Tavily Search API
+TAVILY_API_KEY="your_tavily_key"
+
+# Pinecone Vector DB
+PINECONE_API_KEY="your_pinecone_key"
+INDEX_NAME="your_pinecone_index_name"
+```
+
+### Basic Agent Initialization Template
+```python
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-load_dotenv()            -> Load API keys
-ChatGoogleGenerativeAI   -> Gemini model
-@tool                    -> Create functions agent can use
-create_agent()           -> Create AI agent
-HumanMessage             -> User message object
+load_dotenv()              # Load API keys
+llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash") # Gemini model (Brain)
 
+@tool
+def sample_tool(query: str) -> str:
+    """Create functions agent can use."""
+    return "result"
 
-##################################
-Agent = Manager
+agent = create_agent(model=llm, tools=[sample_tool]) # Create AI agent (Manager)
+response = agent.invoke({"messages": [HumanMessage(content="Hello!")]})
+```
 
-Tool = Employee
+---
 
-Gemini = Brain
+## 🚀 Evolution of AI Agents & Tools (Versions 1 - 4)
 
-#####################################
+### Version 1: Static Custom Tools
+- Agent defined with mock custom `@tool` functions returning predefined static strings.
 
-VERSION 2:
-24-jUNE VIDOE 21-
+### Version 2: Live Web Search with Tavily Client
+- Integrated `from tavily import TavilyClient`.
+- Automatically fetches `TAVILY_API_KEY` from environment.
+- Transformed static functions into dynamic real-world search capabilities:
+  ```python
+  from tavily import TavilyClient
+  tavily = TavilyClient()
+  return tavily.search(query=query)
+  ```
 
-STEP 1 : 
-- from tavily import TavilyClinet
+### Version 3: Built-in LangChain Tavily Tool
+- Replaced manual client calls with native LangChain search tool:
+  ```python
+  from langchain_tavily import TavilySearch
+  tools = [TavilySearch()]
+  ```
 
-step 2:
-  tavily=TavilyClinet() 
-    
- - this auto search env and get apikey
-    
-step 3:
-   tool function 
-     -Static return to real return search capailty
--   return tavily.search(query=query)
-step 4:
-
-    finally we give full permission to access internet tavily
-
-Version 3:
-   - langcain tavily
-   - inbuild tavily search and more 
-step 1:
-    we use own tavily lanchain
--  from langchain_tavily import tavilySearch
-
-step 2:
-    just 
-- tools = [tavilySearch ] and RUn the code
-
-    
-- version 4
-- structure output 
-
-step 1
+### Version 4: Structured Output with Pydantic
+- Enforcing typed, predictable schema for agent responses instead of plain raw strings:
+  ```python
   from typing import List
-  from pydantic import BaseModel, Field #own stuture use BaseModel
+  from pydantic import BaseModel, Field
 
-step 2: 
-  - added new class
+  class Source(BaseModel):
+      """Schema for source used by agent"""
+      url: str = Field(description="The URL of the source")
 
-class Source(BaseModel):
-    """Schema for source used by agent"""
-    url:str =Field(description="The URL of the source")
+  class AgentResponse(BaseModel):
+      """Schema for agent response with answer and Source"""
+      answer: str = Field(description="The agent's answer to the query")
+      source: List[Source] = Field(default_factory=list, description="List of sources used to generate the answer")
 
-class AgentResponse(BaseModel):
-    """schema for agent response with answer and Source"""
-    
-    answer:str = Field(description="The agents answer to the query")
-    source:List[Source]=Field(default_factory=list,description="List of sources uses to geneate the answer")
+  agent = create_agent(model=llm, tools=tools, response_format=AgentResponse)
+  ```
 
-step 3:
-   agent = create_agent(model=llm, tools=tools,response_format=AgentResponse)
-    
-   # some debug more we try
+> **Structured Output Strategies:**
+> 1. `tool_strategy`: Enforces output using tool-calling schema.
+> 2. `provider_strategy`: (Default) Uses model provider's native structured output capabilities.
 
-# Viode numeber 23 
+---
 
- use stuctutre op 
+## 🔍 Under the Hood: The 3 Layers of Agents
 
- 1.two type 
-         1.toolstrategey 
-         2. providerstategey [defautl] langchain past project we done
-  
+### Layer 1: LangChain Tool Calling & Model Switching
+File: `1_agent_loop_langchain_tool_calling.py`
 
-# Agent Understand HOOD layer1 video 24 to 27
-- 24 
-   explain core all 
-   what layer and what we do
+- Built an E-Commerce Assistant agent that handles queries about pricing and discount calculations.
+- Seamlessly switched between local models (Ollama) and cloud APIs (Google Gemini) using `init_chat_model`:
+  ```python
+  from langchain.chat_models import init_chat_model
 
-- 25
-   waht we build : Ecommerce Agent
-   Agent about query from agent and get the discount 
+  Model_ollama = "qwen3.5:0.8b"
+  Model_gemini = "gemini-1.5-flash"
 
-- 26
-   here we explain ReACT loop
-   # Top algorth foundaction in AI
-   
-    diagram:
-    see the diagam
-    user query -> THought -> Action -> tool -> Observation -> THought -> answer
-  
-- 27 stepup
+  # Switch effortlessly:
+  # llm = init_chat_model(f"ollama:{Model_ollama}", temperature=0)
+  llm = init_chat_model(f"google_genai:{Model_gemini}", temperature=0)
+  llm_with_tools = llm.bind_tools(tools)
+  ```
 
-    this project we need ollama
+---
 
-    # uv add langchain langchain-ollama lagchain-google-genai python-dotenv black isort
-    # download qwen3:1.7b for toll calling support we use qwen3.5:0.8b
+### Layer 2: Raw Function Calling & The 7-Step Memory Loop
+File: `2_agent_loop_raw_function_calling.py`
 
-- 28 Write tools
-  # Layer [1] for ReAct Loop
-  
-  Creat a new file name: 1_agent_loop_langchain_tool_calling.py
-  # need more attenction for this code in future 
+Demonstrates how tool calling works under the hood **without using LangChain**, breaking down how LLMs emit JSON and how code intercepts and executes them:
 
-- 29 30 31
-
-  how to easy chage model use that import init_chat_model
-    Model= "qwen3.5:0.8b"
-    Model_gen="gemini-1.5-flash"
-    # #llm = init_chat_model(f"ollama:{Model}",temperature=0)
-    llm = init_chat_model(f"google_genai:{Model_gen}",temperature=0)
-    llm_with_tools = llm.bind_tools(tools)
-   
-   # main concern is switch model ok but this not enoff
-
-# Section [6]
-  # -- [Layer 2] Raw function calling
-
-  - 32 33 34
-  # this vidoe we learn Tool raw how they work without langchain
-  # this full you will see - 2 agent loop.py 
-  # with out lagchain how difficult to apply tools need more study on this
-  🧑 USER: "What is the price of a laptop?"
+```text
+ 🧑 USER: "What is the price of a laptop?"
    │
    ▼
  📥 STEP 1: THE MEMORY BANK (messages list)
@@ -208,16 +244,17 @@ step 3:
          We send the updated memory bank back to the AI (Step 2).
          The AI reads it, sees the price is 50000, and finally has 
          enough info to talk to the user!
-         
+```
 
-# section 7 [Layer 3] the foundaction of function calling
+---
 
-- 35 we are bulding function alling
- 
-  ReAct prompt is most import on in fuction calling
-  this use 
-  # this wasthe ReAct first prompt 
-  Answer the following questions as best you can. You have access to the following tools:
+### Layer 3: The Foundation of ReAct Prompting
+File: `3_raw_ReAct_prompt.py`
+
+Before native function calling APIs existed, agents operated purely via formatted text instructions following the **ReAct (Reason + Act)** pattern:
+
+```text
+Answer the following questions as best you can. You have access to the following tools:
 
 {tools}
 
@@ -236,65 +273,102 @@ Begin!
 
 Question: {input}
 Thought:{agent_scratchpad}
+```
 
-# 36 Generating dynamic Tool Description in python 
+#### Why Native Function Calling Surpassed Raw ReAct:
+- **Reliability:** No regex parsing failures or halluncinated formatting errors.
+- **Cost Effective:** Lower token consumption.
+- **Structured:** Guarantees strict JSON schema arguments.
 
-    complted but old how llm and ReAct work very tuff
+---
 
-# 40 41 function calling 
+## 📚 RAG (Retrieval-Augmented Generation)
 
-   tool calling and Recation is not relaiable 
+RAG connects LLMs to custom knowledge bases (documents, PDFs, articles) by retrieving relevant excerpts before answering.
 
-   # but function calling more relaible that maily focus
+```mermaid
+flowchart LR
+    subgraph Ingestion [1. Ingestion Pipeline]
+        Doc[Text Document] --> Split[Text Splitter]
+        Split --> Chunks[Chunks: 1000 chars]
+        Chunks --> Embed[Embedding Model]
+        Embed --> VectorDB[(Pinecone Vector Store)]
+    end
 
-   - benifit 
-      stucture and relainbale
-      effective token cost saving 
+    subgraph Retrieval [2. Query & Generation Pipeline]
+        Query[User Question] --> QEmbed[Embedding Model]
+        QEmbed --> Search[(Pinecone Search)]
+        Search --> TopK[Top-K Chunks]
+        TopK --> Prompt[Context + Question]
+        Prompt --> LLM[Gemini 2.5 Flash]
+        LLM --> Response[Final Answer]
+    end
+```
 
-      development easy
-      structure flow
+### Phase 1: Data Ingestion & Indexing (`Rag_first.py`)
 
+1. **Document Loading**: `TextLoader` loads documents into memory.
+2. **Text Chunking**: `CharacterTextSplitter(chunk_size=1000, chunk_overlap=100)` splits text into manageable pieces.
+3. **Embeddings**: `GoogleGenerativeAIEmbeddings(model="gemini-embedding-2")` translates text into high-dimensional vector space.
+4. **Vector Storage**: `PineconeVectorStore.from_documents(...)` persists chunks into Pinecone.
 
-# 42 video RAG
-   - Rag is used for our document -> chunking -> save -> get use llm
+### Phase 2: Retrieval & Generation (`Rag_second_without LCEL.py`)
 
-# 43 Indroduction RAG implementaction
-   - this all topic we will see
-     
-    #   Embeddings
-        use vercote method easy to get checking data
-    #  Vector stores (Pinecone)
+#### Approach A: Manual Retrieval (Without LCEL)
+- Steps manually executed: `retriever.invoke(query)` ➔ string formatting ➔ `prompt_template.format_messages(...)` ➔ `llm.invoke(messages)`.
+- *Drawbacks:* Verbose, synchronous, no built-in streaming or batching.
 
-    #  RetrievalQA Chain
+#### Approach B: Declarative Pipeline with LCEL (Recommended)
+```python
+def create_retrieval_chain_with_lcel():
+    retrieval_chain = (
+        RunnablePassthrough.assign(
+            context=itemgetter("question") | retriever | formate_doc
+        )
+        | prompt_template
+        | llm
+        | StrOutputParser()
+    )
+    return retrieval_chain
+```
+- **Advantages:** Declarative pipe syntax (`|`), built-in streaming (`chain.stream()`), async execution (`chain.ainvoke()`), and LangSmith trace observability.
 
-    # LangChain document loaders  
-      - load documet use langcain
+---
 
-    #  LangChain text splitters
+## 🌿 Branch Directory & Project Index
 
-# 45 start in rag_first.py
+Each branch in this repository captures a dedicated milestone in the learning journey:
 
-from dotenv import load_dotenv
-from langchain_community.document_loaders import text_loader  #load data into text
-from langchain_text_splitter import character_text_splitter  #split large text into chunks 
-from langchain_google_genai import GoogleGenerativeAIEmbeddings # this method is used to convert text into vector representation
-from langchain_pinecone import Pineconevectorstore # this method is used to store vector DB into pinecone
+| Branch Name | Core Topic | Key Files | What You Can Learn |
+|---|---|---|---|
+| **`Rag`** *(Newest / Active)* | **Full RAG & Complete Agent Guide** | `Rag_first.py`<br>`Rag_second_without LCEL.py`<br>`1_agent_loop_langchain_tool_calling.py`<br>`2_agent_loop_raw_function_calling.py`<br>`3_raw_ReAct_prompt.py` | Complete RAG indexing into Pinecone, manual vs LCEL retrieval chains, plus full code for all 3 agent layers. |
+| **`ReAct_Ecom_chatbot`** | **Under The Hood: 3 Agent Layers** | `1_agent_loop_langchain_tool_calling.py`<br>`2_agent_loop_raw_function_calling.py`<br>`3_raw_ReAct_prompt.py` | Deep dive into ReAct mechanics: LangChain tool calling, raw Python function execution loops, and classic ReAct prompt templates. |
+| **`langchainSearchAgent`** | **Tavily Search & Structured Output** | `main.py`<br>`pyproject.toml` | Evolutionary progression from static tools to Tavily real-time search, finishing with Pydantic structured output (`Source`, `AgentResponse`). |
+| **`agentLearn-23-jun`** | **First Agents & Tools** | `main.py`<br>`pyproject.toml` | Core Agentic Triad (Manager / Employee / Brain), `@tool` decorator, and introduction to live web search. |
+| **`Langsmith_First_project`** | **Observability & Tracing** | `Langsmith.py`<br>`README.md` | Setting up LangSmith with `LANGSMITH_TRACING=true` and tracing chains with `@traceable`. |
+| **`main`** | **Local LLMs with Ollama** | `Test_ollama.py`<br>`gen.py`<br>`main.py` | Connecting LangChain to local Ollama models (`gemma3:270m`, `qwen`), prompt templates, and chain execution. |
+| **`day2-talkToLLM`** | **Talking to LLMs with Gemini** | `gen.py`<br>`main.py` | Early LangChain prompts, invoking Google Gemini, and parsing model text completions. |
+| **`Lanchain/helloworld`** | **Project Setup & Hello World** | `main.py`<br>`pyproject.toml` | Environment bootstrap with `uv`, basic dependencies, and running your first LangChain script. |
 
-# 46 and 47 Data indexing complte you can see in Rag_first.py 
-   document loader -> data chunking -> embedding-> vercore DB like pinecone
-# 48 we will do data retricial and generation 
-  
-    user query ->vector embedding -> vector Db -> top-K chucks 
-                                                               - llm -> response 
-     
-   # file name Rag_second without LCEL.py  LangChain Expression Language
+---
 
-# 49 Rag use LCEL
-   from langchain_core.output_parsers import StrOutputParser
-   from langchain_core.runnables import RunnablePassthrough  # input and op same
-   from operator import itemgetter  #
+## 📜 How to Switch Between Branches
 
-   create new function langchain as chain
- # create_retrieval_chain_with_lcel() need toe lean this fully 
-   
+To inspect the specific code for any topic:
 
+```bash
+# Fetch all remote branches
+git fetch --all
+
+# Checkout any branch (example: ReAct e-commerce chatbot)
+git checkout ReAct_Ecom_chatbot
+
+# Checkout the newest RAG branch
+git checkout Rag
+```
+
+---
+
+<div align="center">
+  <sub>Documented with 💖 by <a href="https://github.com/DineshRocky07">Dinesh</a> during the Agentic AI Engineering Series.</sub>
+</div>
